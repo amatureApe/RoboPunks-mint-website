@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ethers, BigNumber } from 'ethers'
-import roboPunksNFT from './RoboPunksNFT.json'
+import roboPunksNFTabi from './RoboPunksNFT.json'
 import { Box, Button, Flex, Input, Text } from '@chakra-ui/react'
 
 const roboPunksNFTAddress = '0x76B9c713B3dE80214904FC2e303dbe5c553a8eDb'
@@ -9,19 +9,22 @@ const MainMint = ({ accounts, setAccounts }) => {
     const [mintAmount, setMintAmount] = useState(1)
     const isConnected = Boolean(accounts[0])
 
-    async function handleMint() {
+    const handleMint = async () => {
         if (window.ethereum) {
             const provider = new ethers.providers.Web3Provider(window.ethereum)
             const signer = provider.getSigner()
             const contract = new ethers.Contract(
                 roboPunksNFTAddress,
-                roboPunksNFT.abi,
+                roboPunksNFTabi,
                 signer
             )
             try {
-                const response = await contract.mint(BigNumber.from(mintAmount))
+                const response = await contract.mint(BigNumber.from(mintAmount), {
+                    value: ethers.utils.parseEther((0.02 * mintAmount).toString())
+                })
                 console.log('response', response)
             } catch (err) {
+                // console.log("PING")
                 console.log("error: ", err)
             }
         }
